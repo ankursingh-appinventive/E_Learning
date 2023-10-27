@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Enrollment Confirmation</h1>
+        </div>
+        <div class="content">
+            <p>Hello, {{ userName }},</p>
+            <p>You have successfully enrolled in the course:</p>
+            <h2>{{ courseName }}</h2>
+            <p>The amount to be paid: Rs.{{ amount }}</p>
+            <a class="button" href="{{ paymentLink }}">Pay Now</a>
+            <p>If you have any questions, feel free to contact us.</p>
+            <p>Thank you!</p>
+        </div>
+    </div>
+</body>
+</html>

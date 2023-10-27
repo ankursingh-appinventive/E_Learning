@@ -1,0 +1,2581 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "E_Learning Platform"
+  description: Through its user-friendly interface and robust backend, learners can enroll in courses, track their progress, and engage with fellow learners and instructors.
+tags:
+  - name: User Actions
+    description: APIs related to user actions
+  - name: Course Actions
+    description: APIs related to course actions
+  - name: Assignment Actions
+    description: APIs related to assignment actions
+  - name: Quiz Actions
+    description: APIs related to quiz actions
+  - name: Forum Actions
+    description: APIs related to forumPost actions
+  - name: Review Actions
+    description: APIs related to forumPost actions        
+
+schemes: [http,https]
+
+paths:
+  /user/signup:
+    post:
+      summary: User registration
+      tags:
+        - User Actions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              Name:
+                type: string
+              password:
+                type: string
+              email:
+                type: string
+              phone:
+                type: string
+              role:
+                type: string
+                enum:
+                  - student
+                  - instructor
+      responses:
+        201:
+          description: User registered successfully
+          schema:
+            type: object
+            properties:
+              user:
+                type: object
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/verify:
+    get:
+      summary: Verify user's email
+      tags:
+        - User Actions
+      parameters:
+        - in: query
+          name: id
+          type: string
+          required: true
+          description: The user's ID for email verification
+      responses:
+        200:
+          description: Email verification successful
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        204:
+          description: Email already verified
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/signin:
+    post:
+      summary: User login
+      tags:
+        - User Actions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email or phone:
+                type: string
+              password:
+                type: string
+              deviceID:
+                type: string
+      responses:
+        201:
+          description: User logged in successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              user:
+                type: object
+              token:
+                type: string
+        404:
+          description: User not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized or profile not verified
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/getProfie:
+    get:
+      summary: Get user profile details
+      tags:
+        - User Actions
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User profile details retrieved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: object
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: User profile not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/updateProfile:
+    put:
+      summary: Update user profile
+      tags:
+        - User Actions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        200:
+          description: User profile updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: object            
+        401:
+          description: Unauthorized or profile update failed
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: User profile not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/uploadProfilePic:
+    put:
+      summary: Upload user profile picture
+      tags:
+        - User Actions
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: formData
+          name: image
+          type: file
+          required: true
+          description: The profile picture to upload
+      responses:
+        200:
+          description: Profile picture uploaded successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Bad request (e.g., missing image or user)
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/delete:
+    delete:
+      summary: Delete user profile
+      tags:
+        - User Actions
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User profile deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: User profile not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/forgetPassword:
+    get:
+      summary: Send Email for password reset OTP
+      tags:
+        - User Actions
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Password reset OTP sent successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: User profile not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/forgetPasswordNumber:
+    get:
+      summary: Send SMS for password reset OTP
+      tags:
+        - User Actions
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Password reset OTP sent successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: User profile not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/resetPassword:
+    post:
+      summary: Reset user password using OTP
+      tags:
+        - User Actions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              otp:
+                type: string
+              newPassword:
+                type: string
+              confirmPassword:
+                type: string
+      responses:
+        200:
+          description: Password reset successful
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Bad request (e.g., password mismatch)
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized or password reset failed
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /user/logout:
+    get:
+      summary: User logout
+      tags:
+        - User Actions
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User logged out successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized or logout failed
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string ###############################################################################################
+
+  /course/createCoures:
+    post:
+      summary: Create a new course
+      tags:
+        - Course Actions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              category:
+                type: string
+              description:
+                type: string
+              courseFee:
+                type: string
+              totalModules:
+                type: number
+      responses:
+        200:
+          description: Course created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              result:
+                type: object
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/updateCourse:
+    put:
+      summary: Update an existing course
+      tags:
+        - Course Actions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        200:
+          description: Course updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              updatedCourse:
+                type: object
+        400:
+          description: Instructor mismatch or not allowed
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        404:
+          description: Course not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/deleteCourse:
+    delete:
+      summary: Delete a course
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: courseID
+          required: true
+          type: string
+          description: ID of the course to be deleted
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Course deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              deletedCourse:
+                type: object
+        400:
+          description: Course not found or instructor mismatch
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                    
+        404:
+          description: Course not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/getAllCourses:
+    get:
+      summary: Get all courses
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          type: string
+          description: Page number (Optional)
+        - in: query
+          name: limit
+          type: string
+          description: Number of data retrieved per page (Optional)          
+      responses:
+        200:
+          description: Successfully retrieved all courses
+          schema:
+            type: object
+            properties:
+              courses:
+                type: array
+                items:
+                  $ref: '#/definitions/Course'
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                      
+        400:
+          description: No courses found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/getCourse:
+    get:
+      summary: Get a course by title
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: title
+          required: true
+          type: string
+          description: Title of the course to be retrieved
+        - in: query
+          name: page
+          type: string
+          description: Page number (Optional)
+        - in: query
+          name: limit
+          type: string
+          description: Number of data retrieved per page (Optional)
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Course retrieved successfully
+          schema:
+            type: object
+            properties:
+              courses:
+                type: array
+                items:
+                  $ref: '#/definitions/Course'
+        400:
+          description: Course not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                  
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/getUserCourses:
+    get:
+      summary: Get courses of the user
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          type: string
+          description: Page number (Optional)
+        - in: query
+          name: limit
+          type: string
+          description: Number of data retrieved per page (Optional)   
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successfully retrieved the user's courses
+          schema:
+            type: object
+            properties:
+              courses:
+                type: array
+                items:
+                  $ref: '#/definitions/Course'
+        400:
+          description: No courses found for the user
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                  
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/enrollCourse:
+    post:
+      summary: Enroll in a course
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the course to enroll in
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successfully enrolled in the course
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              next:
+                type: string
+              enrollmentResult:
+                $ref: '#/definitions/EnrollmentResult'
+        404:
+          description: Course not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                  
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/coursePayment:
+    post:
+      summary: Make a payment for a course
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          type: string
+          description: ID of the user making the payment
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the course to make payment for
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Payment successful
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              paymentResult:
+                $ref: '#/definitions/PaymentResult'
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Course not found or invalid request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /course/getProgress:
+    get:
+      summary: Get progress of a user in a course
+      tags:
+        - Course Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the course to get progress for
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Progress retrieved successfully
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: string
+              userId:
+                type: string
+              score:
+                type: number
+              totalModules:
+                type: number
+        400:
+          description: Not enrolled in the course
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                  
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                
+  /course/getCertificate:
+    get:
+      tags:
+        - Course Actions
+      summary: Get a certificate
+      description: Retrieves a certificate for a course.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: ID of the course for which to retrieve the certificate
+          required: true
+          type: string
+      responses:
+        200:
+          description: Certificate send on mail successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                   
+        403:
+          description: User not eligible for certificate
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string ##############################################################################################
+
+  /assignment/createAssignment:
+    post:
+      summary: Create a new course assignment
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: string
+                description: ID of the course for which the assignment is created
+              title:
+                type: string
+                description: Title of the assignment
+              description:
+                type: string
+                description: Description of the assignment
+      responses:
+        200:
+          description: Assignment created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              course:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+              assignment:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  courseId:
+                    type: string
+                  instructorId:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                     
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /assignment/updateAssignment:
+    put:
+      summary: Update an existing course assignment
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Object id of the assignment            
+              title:
+                type: string
+                description: Title of the assignment
+              description:
+                type: string
+                description: Description of the assignment
+      responses:
+        200:
+          description: Assignment updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              updatedAssignment:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  courseId:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Assignment not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /assignment/deleteAssignment:
+    delete:
+      summary: Delete an existing course assignment
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: assignmentID
+          required: true
+          type: string
+          description: ID of the assignment to be deleted
+      responses:
+        200:
+          description: Assignment deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              deletedAssignment:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  courseId:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Assignment not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /assignment/getAllAssignment:
+    get:
+      summary: Get all assignments for a specific course
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the course to retrieve assignments for
+        - in: query
+          name: page
+          type: string
+          description: Page number (Optional)
+        - in: query
+          name: limit
+          type: string
+          description: Number of data retrieved per page (Optional)
+      responses:
+        200:
+          description: List of assignments retrieved successfully
+          schema:
+            type: object
+            properties:
+              assignments:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    instructorId:
+                      type: string  
+                    courseId:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                  
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /assignment/getAssignment:
+    get:
+      summary: Get assignment details by ID
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the assignment to retrieve
+      responses:
+        200:
+          description: Assignment retrieved successfully
+          schema:
+            type: object
+            properties:
+              assignment:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  courseId:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Assignment not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /assignment/getAssignmentByStudent:
+    get:
+      summary: Get assignment details by ID for the current student
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the assignment to retrieve
+      responses:
+        200:
+          description: Assignment retrieved successfully
+          schema:
+            type: object
+            properties:
+              assignment:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  courseId:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+        400:
+          description: Not enrolled or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Assignment not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                 
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /assignment/submitAssignment:
+    post:
+      summary: Submit an assignment by a student
+      tags:
+        - Assignment Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of the assignment to submit
+              submissionText:
+                type: string
+                description: Text of the assignment submission
+      responses:
+        200:
+          description: Assignment submitted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Not enrolled or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Assignment not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                    
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string ##############################################################################################
+
+  /quiz/createCourseQuiz:
+    post:
+      summary: Create a quiz for a course
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: string
+                description: ID of the course for which the quiz is created
+              module:
+                type: string
+                description: Module of the quiz
+              questionNo:
+                type: number
+                description: Question number of the quiz
+              title:
+                type: string
+                description: Title of the quiz
+              question:
+                type: string
+                description: Question text of the quiz
+              options:
+                type: array
+                items:
+                  type: string
+                description: Array of options for the quiz
+              correctOptionIndex:
+                type: number
+                description: Index of the correct option in the options array
+      responses:
+        201:
+          description: Quiz created successfully
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+              courseId:
+                type: string
+              module:
+                type: string
+              questionNo:
+                type: number
+              title:
+                type: string
+              question:
+                type: string
+              options:
+                type: array
+                items:
+                  type: string
+              correctOptionIndex:
+                type: number
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Course not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /quiz/updateCourseQuiz:
+    put:
+      summary: Update a quiz for a course
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: string
+                description: ID of the course to which the quiz belongs
+              questionNo:
+                type: number
+                description: Question number of the quiz
+              question:
+                type: string
+                description: Updated question text of the quiz
+              options:
+                type: array
+                items:
+                  type: string
+                description: Updated array of options for the quiz
+              correctOptionIndex:
+                type: number
+                description: Updated index of the correct option in the options array
+      responses:
+        200:
+          description: Quiz updated successfully
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+              courseId:
+                type: string
+              module:
+                type: string
+              questionNo:
+                type: number
+              title:
+                type: string
+              question:
+                type: string
+              options:
+                type: array
+                items:
+                  type: string
+              correctOptionIndex:
+                type: number
+        400:
+          description: Not allowed or missing data
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        404:
+          description: Quiz not found or not allowed
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /quiz/deleteCourseQuiz:
+    delete:
+      summary: Delete a quiz for a course
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the quiz to be deleted
+      responses:
+        200:
+          description: Quiz deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              deletedQuiz:
+                type: object
+        404:
+          description: Quiz not found or not allowed
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /quiz/getAllCourseQuiz:
+    get:
+      summary: Get all quizzes for a course
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the course to get quizzes for
+        - in: query
+          name: page
+          type: string
+          description: Page number (Optional)
+        - in: query
+          name: limit
+          type: string
+          description: Number of data retrieved per page (Optional)
+      responses:
+        200:
+          description: Quizzes retrieved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              quizzes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    courseId:
+                      type: string
+                    module:
+                      type: string
+                    questionNo:
+                      type: number
+                    title:
+                      type: string
+                    question:
+                      type: string
+                    options:
+                      type: array
+                      items:
+                        type: string
+                    correctOptionIndex:
+                      type: number
+        404:
+          description: Quiz not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /quiz/getCourseQuizByInstructor:
+    get:
+      summary: Get course quiz details for an instructor
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the quiz to retrieve
+      responses:
+        200:
+          description: Quiz details retrieved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              quiz:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  courseId:
+                    type: string
+                  module:
+                    type: string
+                  questionNo:
+                    type: number
+                  title:
+                    type: string
+                  question:
+                    type: string
+                  options:
+                    type: array
+                    items:
+                      type: string
+                  correctOptionIndex:
+                    type: number
+        404:
+          description: Quiz error or not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /quiz/getCourseQuizByStudent:
+    post:
+      summary: Get course quiz details for a student
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+          description: ID of the quiz to retrieve
+      responses:
+        200:
+          description: Quiz details retrieved successfully
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+              courseId:
+                type: string
+              module:
+                type: string
+              questionNo:
+                type: number
+              title:
+                type: string
+              question:
+                type: string
+              options:
+                type: array
+                items:
+                  type: string
+        400:
+          description: User not enrolled to course
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                  
+        404:
+          description: Quiz not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /quiz/submitQuiz:
+    post:
+      summary: Submit course quiz by a student
+      tags:
+        - Quiz Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              quizId:
+                type: string
+              submittedIndex:
+                type: string
+      responses:
+        200:
+          description: Quiz submitted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: User not enrolled to course
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string ###############################################################################################
+
+  /forum/createForumPost:
+    post:
+      summary: Create a forum post
+      tags:
+        - Forum Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              content:
+                type: string
+              courseId:
+                type: string
+      responses:
+        201:
+          description: Forum post created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /forum/getForumPostsByCourse:
+    get:
+      summary: Get user's forum posts by course
+      tags:
+        - Forum Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          description: Course ID
+          type: string
+        - in: query
+          name: page
+          description: Page number (optional)
+          type: string
+        - in: query
+          name: limit
+          description: Number of posts per page (optional)
+          type: string
+      produces:
+        - application/json
+      responses:
+        200:
+          description: User's forum posts retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ForumPost'
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string              
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /forum/getForumPostById:
+    get:
+      summary: Get user's forum post by ID
+      tags:
+        - Forum Actions
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          description: Forum Post ID
+          type: string
+      produces:
+        - application/json
+      responses:
+        200:
+          description: User's forum post retrieved successfully
+          schema:
+            $ref: '#/definitions/ForumPost'
+        404:
+          description: Forum post not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /forum/updateForumPost:
+    patch:
+      summary: Update a forum post
+      tags:
+        - Forum Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              postId:
+                type: string
+              updatedText:
+                type: string
+      responses:
+        200:
+          description: Forum post updated successfully
+          schema:
+            $ref: '#/definitions/UpdatedForumPost'
+        404:
+          description: Forum post not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /forum/deleteForumPost:
+    delete:
+      summary: Delete a forum post
+      tags:
+        - Forum Actions
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Forum post deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Forum post not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /forum/ForumPostWithReplies:
+    put:
+      summary: Update a forum post with replies
+      tags:
+        - Forum Actions
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              postId:
+                type: string
+              text:
+                type: string
+      responses:
+        200:
+          description: Forum post updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              updatedForumPost:
+                type: object
+        404:
+          description: Forum post not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /review/createReview:
+    post:
+      tags:
+        - Review Actions
+      summary: Create a review
+      description: Creates a review for a course.
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: string
+              rating:
+                type: string
+              comment:
+                type: string
+      responses:
+        201:
+          description: Review created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string  
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string              
+
+  /review/getReview:
+    get:
+      tags:
+        - Review Actions
+      summary: Get reviews for a course
+      description: Retrieves reviews for a specific course.
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: courseId
+          description: ID of the course to retrieve reviews for
+          required: true
+          type: string
+        - in: query
+          name: page
+          type: string
+          description: Page number (Optional)
+        - in: query
+          name: limit
+          type: string
+          description: Number of data retrieved per page (Optional)          
+      responses:
+        200:
+          description: Reviews retrieved successfully
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                courseId:
+                  type: string
+                rating:
+                  type: number
+                comment:
+                  type: string
+                createdAt:
+                  type: string
+                updatedAt:
+                  type: string
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string                
+
+  /review/updateReview:
+    put:
+      tags:
+        - Review Actions
+      summary: Update a review
+      description: Updates a review for a course.
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: reviewId
+          in: query
+          description: ID of the review to update
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              studentId:
+                type: string
+              rating:
+                type: number
+              comment:
+                type: string
+      responses:
+        200:
+          description: Review updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Review not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /review/deleteReview:
+    delete:
+      tags:
+        - Review Actions
+      summary: Delete a review
+      description: Deletes a review for a course.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: reviewId
+          in: query
+          description: ID of the review to delete
+          required: true
+          type: string
+        - name: userId
+          in: query
+          description: User ID of the requestor
+          required: true
+          type: string
+      responses:
+        200:
+          description: Review deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Review not found
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        500:
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+definitions:
+  Course:
+    type: object #########################################################################################################
+    properties:
+      title:
+        type: string
+      category:
+        type: string
+      instructorId:
+        type: string
+      description:
+        type: string
+      courseFee:
+        type: string
+      totalModules:
+        type: number
+  EnrollmentResult:
+    type: object
+    properties:
+      user:
+        type: string
+      course:
+        type: string
+      enrollmentDate:
+        type: string
+  PaymentResult:
+    type: object
+    properties:
+      user:
+        type: string
+      course:
+        type: string
+      paymentDate:
+        type: string
+  ForumPost:
+    type: object
+    properties:
+      _id:
+        type: string
+      title:
+        type: string
+      content:
+        type: string
+      courseId:
+        type: string
+      createdBy:
+        type: string
+      createdAt:
+        type: string
+  UpdatedForumPost:
+    type: object
+    properties:
+      _id:
+        type: string
+      title:
+        type: string
+      content:
+        type: string
+      courseId:
+        type: string
+      createdBy:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
+        type: string ######################################################################################################
+
+securityDefinitions:
+  BearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+security:
+  - BearerAuth: []
