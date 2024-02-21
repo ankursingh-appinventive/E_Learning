@@ -7,6 +7,10 @@ import { Enrollment } from "../models/enrollement.Model";
 import {ProgressModel} from "../models/progress.Model";
 import { constants } from '../constants';
 import { mail } from './email.Service';
+const {STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY} = process.env;
+const stripe = require('stripe')(STRIPE_SECRET_KEY, {
+  apiVersion: '2020-08-27'
+});
 import fs from 'fs'
 import path from 'path';
 
@@ -113,10 +117,40 @@ export class courseService{
         }
       };
 
+      // static enrollCourse = async (userId, courseId) => {
+      //   try {
+      //     // const course = await Course.findOne({ _id: courseId, published: true});
+      //     const course = await Course.findOne({ _id: courseId});
+      //     let result
+      //     if (!course || course.published== false) {
+      //       return { success: false};
+      //     }else{
+      //       const enrolled = new Enrollment({
+      //         userId: userId,
+      //         courseId: courseId,
+      //         title: course.title,
+      //         enrollmentDate: Date.now()
+      //       });
+      //       result = await enrolled.save();
+      //     }
+      //     const user = await User.findOne({ _id: userId });
+      //     if (result) {
+      //       const courseFee = parseInt(course.courseFee)
+      //       mail.sendEnrollPaymentMail2(user._id, user.username, user.email, course.title, courseFee, courseId);
+      //       return { success: true, result: result };
+      //     } else {
+      //       return { success: false };
+      //     }
+      //   } catch (error) {
+      //     console.error(error.message);
+      //     throw new Error(constants.errorMsgs.errorCrs);
+      //   }
+      // };
+
       static enrollCourse = async (userId, courseId) => {
         try {
           // const course = await Course.findOne({ _id: courseId, published: true});
-          const course = await Course.findOne({ _id: courseId});  
+          const course = await Course.findOne({ _id: courseId});
           let result
           if (!course || course.published== false) {
             return { success: false};
@@ -131,7 +165,28 @@ export class courseService{
           }
           const user = await User.findOne({ _id: userId });
           if (result) {
-            mail.sendEnrollPaymentMail(user._id, user.username, user.email, course.title, course.courseFee, course._id);
+            const courseFee = parseInt(course.courseFee)
+  
+          const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            mode: "payment",
+            line_items: [
+              {
+                price_data: {
+                  currency: "inr",
+                  product_data: {
+                    name: course.title,
+                  },
+                  unit_amount: courseFee * 100,
+                },
+                quantity: 1, // Assuming quantity is always 1
+              },
+            ],
+            success_url: `http://localhost:3333/course/coursePayment?courseId=${courseId}&userId=${userId}&status=1`,//`${process.env.CLIENT_URL}/success.html`,
+            cancel_url: `http://localhost:3333/course/coursePayment?courseId=${courseId}&userId=${userId}&status=0`,//`${process.env.CLIENT_URL}/cancel.html`,
+          });
+            console.log('url:', session.url)
+            mail.sendEnrollPaymentMail( user.username, user.email, course.title, course.courseFee, session.url);
             return { success: true, result: result };
           } else {
             return { success: false };
@@ -147,18 +202,18 @@ export class courseService{
           const findCourse = await Course.findOne({ _id: courseId });      
           if (!findCourse) {
             return { success: false};
-          }      
+          }
           const payment = new PaymentModel({
             userId: userId,
             courseId: courseId,
             amount: findCourse.courseFee,
             paymentDate: Date.now(),
-          });      
-          await Enrollment.findOneAndUpdate({ courseId: courseId }, { $set: { payment: true } });      
+          });
+          await Enrollment.findOneAndUpdate({ courseId: courseId, userId: userId }, { $set: { payment: true } });      
           const progress = new ProgressModel({
             userId: userId,
             courseId: courseId,
-          });      
+          });
           await progress.save();      
           const result = await payment.save();
           return { success: true, result: result };

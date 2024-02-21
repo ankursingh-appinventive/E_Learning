@@ -4,7 +4,6 @@ import YAML from 'yamljs';
 import path from 'path';
 
 import connectDatabase from './database/dbConfig'
-// import UserRouter from './routers/userRoute';
 import userRouter from './routers/user.Routes';
 import courseRouter from './routers/course.Routes';
 import assignmentRouter from './routers/assignment.Routes';

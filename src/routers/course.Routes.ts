@@ -20,10 +20,10 @@ courseRouter.get('/getAllCourses', session.sessionCheck, courseCont.getAllCourse
 courseRouter.get("/getCourse", session.sessionCheck, courseCont.getCourseByTittle);
 courseRouter.get('/getUserCourses', session.sessionCheck, courseCont.getCourseOfUser);
 courseRouter.post("/enrollCourse", session.sessionCheck, courseCont.enrollCourse);
-courseRouter.post('/coursePayment', courseCont.coursePayment);
+courseRouter.get('/coursePayment', courseCont.coursePayment);
 
-courseRouter.get('/render', courseCont.renderBuyPage);
-courseRouter.post('/payment', courseCont.payment);
+// courseRouter.get('/render', courseCont.renderBuyPage);
+// courseRouter.post('/payment', courseCont.payment);
 
 courseRouter.get("/getProgress", session.sessionCheck, courseCont.getProgress);
 courseRouter.get("/getCertificate", session.sessionCheck, courseCont.getCertificate);

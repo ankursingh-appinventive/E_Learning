@@ -47,7 +47,32 @@ export class mail {
         }
       }
       
-      static sendEnrollPaymentMail =async (user_id, name, email, title, courseFee, course_id) => {
+      static sendEnrollPaymentMail =async ( name, email, title, courseFee, paymentLink) => {
+        try {
+          // const paymentLink = `http://localhost:3333/course/coursePayment?id=${course_id}&user_id=${user_id}`;
+          // const paymentLink = `http://localhost:3333/course/coursePayment?courseId=${course_id}&userId=${user_id}`;
+          // const template = fs.readFileSync('/home/admin2/Desktop/E_Learning/src/templets/courseEnrollment.html', 'utf-8',);
+          const templatePath = path.join(process.cwd(), 'src', 'templets', 'courseEnrollment.html');
+          const template = fs.readFileSync(templatePath, 'utf-8');
+          const mailOptions = {
+              from: process.env.EMAIL,
+              to: email,
+              subject: 'Enrollment Confirmation & Payment Mail',
+              html: template.replace('{{ userName }}', name).replace('{{ courseName }}', title).replace('{{ amount }}', courseFee).replace('{{ paymentLink }}', paymentLink)
+            };
+          this.transporter.sendMail(mailOptions, function(error,info){
+              if(error){
+                  console.log(error)
+              }else{
+                  console.log("email has been sent :-", info.response);
+              }
+          })
+        } catch (error) {
+            console.log(error.message);
+        }
+      }
+
+      static sendEnrollPaymentMail2 =async (user_id, name, email, title, courseFee, course_id) => {
         try {
           // const paymentLink = `http://localhost:3333/course/coursePayment?id=${course_id}&user_id=${user_id}`;
           const paymentLink = `http://localhost:3333/course/render?id=${course_id}&user_id=${user_id}`;
@@ -71,5 +96,4 @@ export class mail {
             console.log(error.message);
         }
       }
-
 }
